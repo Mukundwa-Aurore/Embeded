@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Light Control</title>
+    <script src="https://unpkg.com/mqtt@5.0.4/dist/mqtt.min.js"></script>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* Container for all content */
+        .container {
+            text-align: center;
+            background-color: #c9bdbd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 350px;
+            max-width: 90%;
+        }
+
+        /* Button Styles */
+        .button {
+            padding: 15px 30px;
+            margin: 15px 10px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        #turnOnBtn {
+            background-color: #000000;
+            color: white;
+        }
+
+        #turnOnBtn:hover {
+            background-color: #218838;
+        }
+
+        #turnOffBtn {
+            background-color: #000000;
+            color: white;
+        }
+
+        #turnOffBtn:hover {
+            background-color: #c82333;
+        }
+
+        /* Status Text */
+        #status {
+            font-size: 1.2rem;
+            color: #555;
+            margin-top: 20px;
+            font-weight: 400;
+        }
+
+        /* Light Bulb Image */
+        #bulb {
+            width: 150px;
+            height: 150px;
+            margin-top: 25px;
+            transition: filter 0.4s ease, transform 0.3s ease;
+        }
+
+        .on {
+            filter: brightness(150%) drop-shadow(0 0 30px rgba(255, 255, 59, 0.8));
+            transform: scale(1.05);
+        }
+
+        .off {
+            filter: brightness(50%) grayscale(100%);
+        }
+
+        /* Media Queries for responsiveness */
+        @media (max-width: 600px) {
+            .container {
+                width: 90%;
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .button {
+                font-size: 1rem;
+                padding: 12px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MQTT Light Control</h1>
+        <button id="turnOnBtn" class="button">Turn ON</button>
+        <button id="turnOffBtn" class="button">Turn OFF</button>
+        <p id="status">Status: Waiting for command...</p>
+        <img id="bulb" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Gluehlampe_01_KMJ.png/250px-Gluehlampe_01_KMJ.png" alt="Light Bulb" class="off">
+    </div>
+
+    <script>
+        // MQTT Client Setup
+        const client = mqtt.connect('wss://test.mosquitto.org:8081');
+        const topic = '/student_group/light_control';
+
+        client.on('connect', () => {
+            console.log('Connected to MQTT broker');
+        });
+
+        // Elements
+        const turnOnBtn = document.getElementById('turnOnBtn');
+        const turnOffBtn = document.getElementById('turnOffBtn');
+        const status = document.getElementById('status');
+        const bulb = document.getElementById('bulb');
+
+        // Turn ON button
+        turnOnBtn.addEventListener('click', () => {
+            client.publish(topic, 'ON');
+            status.textContent = 'Status: Light is TURNED ON';
+            bulb.classList.remove('off');
+            bulb.classList.add('on');
+        });
+
+        // Turn OFF button
+        turnOffBtn.addEventListener('click', () => {
+            client.publish(topic, 'OFF');
+            status.textContent = 'Status: Light is TURNED OFF';
+            bulb.classList.remove('on');
+            bulb.classList.add('off');
+        });
+    </script>
+</body>
+</html>
